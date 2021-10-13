@@ -1,0 +1,9 @@
+﻿  Scene.cpp
+D:\MesDossiers\EngineProject\VulkanRenderer\code\Scene.cpp(153,59): warning C4267: 'initialisation' : conversion de 'size_t' en 'int', perte possible de données
+D:\MesDossiers\EngineProject\VulkanRenderer\code\Scene.cpp(153,59): warning C4267: 'initialisation' : conversion de 'size_t' en 'const int', perte possible de données
+  Génération de code en cours
+  3 of 1796 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    4 functions had inline decision re-evaluated but remain unchanged
+  Fin de la génération du code
+  GamePhysicsWeekend.vcxproj -> D:\MesDossiers\EngineProject\VulkanRenderer\x64\Release\GamePhysicsWeekend.exe

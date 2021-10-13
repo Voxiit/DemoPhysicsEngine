@@ -19,6 +19,9 @@
     <Filter Include="code\Physics\Constraints">
       <UniqueIdentifier>{2305611d-ec70-4b22-952a-04699c9ff7d5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="code\Bodies">
+      <UniqueIdentifier>{40803ae1-08bf-4ef4-be17-fdb5880ef80c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\main.cpp">
