@@ -163,3 +163,15 @@ void FillDiamond() {
 		}
 	}
 }
+
+extern Vec3 g_basicTetrahedron[] = {
+	Vec3(-10,-10,-2),
+	Vec3(-10,10,-2),
+	Vec3(10,-10,-2),
+	Vec3(10,10,-2),
+
+	Vec3(-10,-10,0),
+	Vec3(-10,10,0),
+	Vec3(10,-10,0),
+	Vec3(10,10,0),
+};

@@ -28,3 +28,5 @@ public:
 	ManifoldCollector m_manifolds;
 };
 
+void AddStandardSandBox(std::vector<Body>& bodies);
+
