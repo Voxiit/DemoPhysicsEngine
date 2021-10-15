@@ -132,6 +132,9 @@
     <ClCompile Include="code\Physics\Manifold.cpp">
       <Filter>code\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="code\Math\Random.cpp">
+      <Filter>code\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\application.h">
@@ -253,6 +256,9 @@
     </ClInclude>
     <ClInclude Include="code\Physics\Manifold.h">
       <Filter>code\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="code\Math\Random.h">
+      <Filter>code\Math</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

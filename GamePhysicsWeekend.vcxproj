@@ -24,6 +24,7 @@
     <ClCompile Include="code\main.cpp" />
     <ClCompile Include="code\Math\Bounds.cpp" />
     <ClCompile Include="code\Math\LCP.cpp" />
+    <ClCompile Include="code\Math\Random.cpp" />
     <ClCompile Include="code\Physics\Body.cpp" />
     <ClCompile Include="code\Physics\Broadphase.cpp" />
     <ClCompile Include="code\Physics\Constraints.cpp" />
@@ -63,6 +64,7 @@
     <ClInclude Include="code\Math\LCP.h" />
     <ClInclude Include="code\Math\Matrix.h" />
     <ClInclude Include="code\Math\Quat.h" />
+    <ClInclude Include="code\Math\Random.h" />
     <ClInclude Include="code\Math\Vector.h" />
     <ClInclude Include="code\Physics\Body.h" />
     <ClInclude Include="code\Physics\Broadphase.h" />

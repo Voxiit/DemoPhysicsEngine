@@ -67,3 +67,13 @@ void RemoveUnreferencedVerts(std::vector<Vec3>& hullPoints, std::vector<tri_t>& 
 bool IsExternal(const std::vector<Vec3>& pts, const std::vector<tri_t>& tris, const Vec3& pt);
 Vec3 CalculateCenterOfMass(const std::vector<Vec3>& pts, const std::vector<tri_t>& tris);
 Mat3 CalculateInertiaTensor(const std::vector<Vec3>& pts, const std::vector<tri_t>& tris, const Vec3& cm);
+
+//Monte Carlo
+static Vec3 CalculateCenterOfMassMonteCarlo(const std::vector<Vec3>& pts, const std::vector<tri_t>& tris);
+Mat3 CalculateInertiaTensorMonteCarlo(const std::vector<Vec3>& pts, const std::vector<tri_t>& tris, const Vec3& cm);
+
+// Exact inertia tensor for convex hulls
+float TetrahedronVolume(const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d);
+Vec3 CalculateCenterOfMassTetrahedron(const std::vector<Vec3>& pts, const std::vector<tri_t>& tris);
+Mat3 InertiaTensorTetrahedron(const Vec3& ptA, const Vec3& ptB, const Vec3& ptC, const Vec3& ptD);
+Mat3 CalculateInertiaTensorTetrahedron(const std::vector<Vec3>& pts, const std::vector<tri_t>& tris, const Vec3& cm);

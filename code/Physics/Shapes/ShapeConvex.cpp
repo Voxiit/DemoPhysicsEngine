@@ -2,6 +2,7 @@
 //  ShapeConvex.cpp
 //
 #include "ShapeConvex.h"
+#include "../../Math/Random.h"
 
 /*
 ========================================================================================================
@@ -46,9 +47,13 @@ void ShapeConvex::Build( const Vec3 * pts, const int num ) {
 	m_bounds.Clear();
 	m_bounds.Expand(m_points.data(), m_points.size());
 
-	m_centerOfMass = CalculateCenterOfMass(hullPoints, hullTriangles);
+	//m_centerOfMass = CalculateCenterOfMass(hullPoints, hullTriangles);
+	//m_centerOfMass = CalculateCenterOfMassMonteCarlo(hullPoints, hullTriangles);
+	m_centerOfMass = CalculateCenterOfMassTetrahedron(hullPoints, hullTriangles);
 
-	m_inertiaTensor = CalculateInertiaTensor(hullPoints, hullTriangles, m_centerOfMass);
+	//m_inertiaTensor = CalculateInertiaTensor(hullPoints, hullTriangles, m_centerOfMass);
+	//m_inertiaTensor = CalculateInertiaTensorMonteCarlo(hullPoints, hullTriangles, m_centerOfMass);
+	m_inertiaTensor = CalculateInertiaTensorTetrahedron(hullPoints, hullTriangles, m_centerOfMass);
 }
 
 /*
@@ -663,4 +668,246 @@ Mat3 CalculateInertiaTensor(const std::vector<Vec3>& pts, const std::vector<tri_
 
 	tensor *= 1.0f / (float)sampleCount;
 	return tensor;
+}
+
+
+
+
+// Monte Carlo
+/*
+====================================================
+CalculateCenterOfMassMonteCarlo
+====================================================
+*/
+static Vec3 CalculateCenterOfMassMonteCarlo(const std::vector<Vec3>& pts, const std::vector<tri_t>& tris)
+{
+	const int numSamples = 10000;
+
+	Bounds bounds;
+	bounds.Expand(pts.data(), (int)pts.size());
+
+	Vec3 cm(0.0f);
+	int sampleCount = 0;
+	for (int i = 0; i < numSamples; i++)
+	{
+		Vec3 pt;
+		pt.x = bounds.mins.x + Random::Get() * bounds.WidthX();
+		pt.y = bounds.mins.y + Random::Get() * bounds.WidthY();
+		pt.z = bounds.mins.z + Random::Get() * bounds.WidthZ();
+		
+		if (IsExternal(pts, tris, pt))
+		{
+			continue;
+		}
+
+		cm += pt;
+		sampleCount++;
+	}
+
+	cm /= (float)sampleCount;
+	return cm;
+}
+
+/*
+====================================================
+CalculateInertiaTensorMonteCarlo
+====================================================
+*/
+Mat3 CalculateInertiaTensorMonteCarlo(const std::vector<Vec3>& pts, const std::vector<tri_t>& tris, const Vec3& cm)
+{
+	const int numSamples = 10000;
+	Bounds bounds;
+	bounds.Expand(pts.data(), (int)pts.size());
+
+	Mat3 tensor;
+	tensor.Zero();
+
+	int sampleCount = 0;
+	for (int i = 0; i < numSamples; i++)
+	{
+		Vec3 pt;
+		pt.x = bounds.mins.x + Random::Get() * bounds.WidthX();
+		pt.y = bounds.mins.y + Random::Get() * bounds.WidthY();
+		pt.z = bounds.mins.z + Random::Get() * bounds.WidthZ();
+
+		if (IsExternal(pts, tris, pt))
+		{
+			continue;
+		}
+
+		// Get the point relative to the center of mass
+		pt -=cm;
+
+		tensor.rows[0][0] += pt.y * pt.y + pt.z * pt.z;
+		tensor.rows[1][1] += pt.z * pt.z + pt.x * pt.x;
+		tensor.rows[2][2] += pt.x * pt.x + pt.z * pt.z;
+		
+		tensor.rows[0][1] += -1.0f * pt.x * pt.y;
+		tensor.rows[0][2] += -1.0f * pt.x * pt.z;
+		tensor.rows[1][2] += -1.0f * pt.y * pt.z;
+
+		tensor.rows[1][0] += -1.0f * pt.x * pt.y;
+		tensor.rows[2][0] += -1.0f * pt.x * pt.z;
+		tensor.rows[2][1] += -1.0f * pt.y * pt.z;
+
+		sampleCount++;
+	}
+
+	tensor *= 1.0f / (float)sampleCount;
+	return tensor;
+}
+
+
+
+
+
+// Exact inertia tensor for convex hulls
+/*
+====================================================
+TetrahedronVolume
+====================================================
+*/
+float TetrahedronVolume(const Vec3& a, const Vec3& b, const Vec3& c, const Vec3& d)
+{
+	const Vec3 ad = d - a;
+	const Vec3 bd = d - b;
+	const Vec3 cd = d - c;
+	float numerator = ad.Dot(bd.Cross(cd));
+	float volume = numerator / 6.0f;
+
+	return volume;
+}
+
+/*
+====================================================
+CalculateCenterOfMassTetrahedron
+====================================================
+*/
+Vec3 CalculateCenterOfMassTetrahedron(const std::vector<Vec3>& pts, const std::vector<tri_t>& tris)
+{
+	std::vector<Vec3> cms;
+	std::vector<float> volumes;
+	float totalVolume = 0.0f;
+	cms.reserve(tris.size());
+	volumes.reserve(tris.size());
+
+	Vec3 centerish(0.0f);
+	for(int i = 0; i < pts.size(); i++)
+	{
+		centerish += pts[i];
+	}
+	centerish *= 1.0f / float(pts.size());
+
+	for (int i = 0; i < tris.size(); i++)
+	{
+		const tri_t& tri = tris[i];
+
+		const Vec3& ptA = centerish;
+		const Vec3& ptB = pts[tri.a];
+		const Vec3& ptC = pts[tri.b];
+		const Vec3& ptD = pts[tri.c];
+
+		const Vec3 centerOfMassOfThisSimplex = (ptA + ptB + ptC + ptD) * 0.25f;
+		const float volume = TetrahedronVolume(ptA, ptB, ptC, ptD);
+		cms.push_back(centerOfMassOfThisSimplex);
+		volumes.push_back(volume);
+		totalVolume += volume;
+	}
+
+	Vec3 cm(0.0f);
+	for (int i = 0; i < cms.size(); i++)
+	{
+		cm += cms[i] * volumes[i];
+	}
+	cm *= 1.0f / totalVolume;
+	
+	return cm;
+}
+
+/*
+====================================================
+InertiaTensorTetrahedron
+====================================================
+*/
+Mat3 InertiaTensorTetrahedron(const Vec3& ptA, const Vec3& ptB, const Vec3& ptC, const Vec3& ptD)
+{
+	const Vec3 pts[4] = {ptA, ptB, ptC, ptD};
+
+	Mat3 mat;
+	mat.rows[0] = Vec3(pts[1].x - pts[0].x, pts[2].x - pts[0].x, pts[3].x - pts[0].x);
+	mat.rows[1] = Vec3(pts[1].y - pts[0].y, pts[2].y - pts[0].y, pts[3].y - pts[0].y);
+	mat.rows[2] = Vec3(pts[1].z - pts[0].z, pts[2].z - pts[0].z, pts[3].z - pts[0].z);
+	const float DetJ = fabsf(mat.Determinant());
+
+	const float density = 1.0f;
+	const float mu = density;
+
+	float xx = 0;
+	float yy = 0;
+	float zz = 0;
+
+	float xy = 0;
+	float xz = 0;
+	float yz = 0;
+
+	for (int i = 0; i < 4; i++)
+	{
+		for (int j = i; j < 4; j++)
+		{
+			// diagonales
+			xx += pts[i].x * pts[j].x;
+			yy += pts[i].y * pts[j].y;
+			zz += pts[i].z * pts[j].z;
+
+			// off diagonals
+			xy += pts[i].x * pts[j].y + pts[j].x * pts[i].y;
+			xz += pts[i].x * pts[j].z + pts[j].x * pts[i].z;
+			yz += pts[i].y * pts[j].z + pts[j].y * pts[i].z;
+		}
+	}
+
+	const float a = mu * DetJ * (yy + zz) / 60.0f;
+	const float b = mu * DetJ * (xx + zz) / 60.0f;
+	const float c = mu * DetJ * (xx + yy) / 60.0f;
+
+	const float aprime = mu * DetJ * yz / 120.0f;
+	const float bprime = mu * DetJ * xz / 120.0f;
+	const float cprime = mu * DetJ * xy / 120.0f;
+
+	Mat3 inertiaTensor;
+	inertiaTensor.rows[0] = Vec3(a, -cprime, -bprime);
+	inertiaTensor.rows[1] = Vec3(-cprime, b, -aprime);
+	inertiaTensor.rows[2] = Vec3(-bprime, -aprime, c);
+
+	return inertiaTensor;
+}
+
+/*
+====================================================
+CalculateInertiaTensorTetrahedron
+====================================================
+*/
+Mat3 CalculateInertiaTensorTetrahedron(const std::vector<Vec3>& pts, const std::vector<tri_t>& tris, const Vec3& cm)
+{
+	Mat3 inertiaTensor;
+	inertiaTensor.Zero();
+	float totalVolume = 0.0f;
+	for (int i = 0; i < tris.size(); i++)
+	{
+		const tri_t& tri = tris[i];
+
+		const Vec3 ptA = cm - cm;
+		const Vec3 ptB = pts[tri.a] - cm;
+		const Vec3 ptC = pts[tri.b] - cm;
+		const Vec3 ptD = pts[tri.c] - cm;
+
+		Mat3 tensor = InertiaTensorTetrahedron(ptA, ptB, ptC, ptD);
+		inertiaTensor += tensor;
+
+		const float volume = TetrahedronVolume(ptA, ptB, ptC, ptD);
+		totalVolume += volume;
+	}
+	
+	inertiaTensor *= 1.0f / totalVolume;
+	return inertiaTensor;
 }
