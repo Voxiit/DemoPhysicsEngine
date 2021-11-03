@@ -26,7 +26,14 @@ public:
 	std::vector< Body > m_bodies;
 	std::vector< Constraint * >	m_constraints;
 	ManifoldCollector m_manifolds;
+
+	// Differents type of Initialization
+	void InitializationRandomSphere();
+	void InitializationFallingRope();
+	void InitializationMerryGoRound();
+	void InitializationStackBoxes();
 };
 
 void AddStandardSandBox(std::vector<Body>& bodies);
+void AddStandardSandBoxBis(std::vector<Body>& bodies);
 

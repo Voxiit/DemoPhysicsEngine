@@ -18,4 +18,7 @@ extern Vec3 g_boxLimb[ 8 ];
 extern Vec3 g_boxHead[ 8 ];
 extern Vec3 g_diamond[ 7 * 8 ];
 extern Vec3 g_basicTetrahedron[ 8 ];
+extern Vec3 g_boxGroundBis[8];
+extern Vec3 g_boxWall0Bis[8];
+extern Vec3 g_boxWall1Bis[8];
 void FillDiamond();

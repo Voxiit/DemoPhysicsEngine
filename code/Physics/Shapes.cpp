@@ -175,3 +175,43 @@ extern Vec3 g_basicTetrahedron[] = {
 	Vec3(10,-10,0),
 	Vec3(10,10,0),
 };
+
+
+static const float wBis = 10;
+static const float hBis = 10;
+
+Vec3 g_boxGroundBis[] = {
+	Vec3(-wBis,-hBis, 0),
+	Vec3(wBis,-hBis, 0),
+	Vec3(-wBis, hBis, 0),
+	Vec3(wBis, hBis, 0),
+
+	Vec3(-wBis,-hBis,-1),
+	Vec3(wBis,-hBis,-1),
+	Vec3(-wBis, hBis,-1),
+	Vec3(wBis, hBis,-1),
+};
+
+Vec3 g_boxWall0Bis[] = {
+	Vec3(-1,-hBis, 0),
+	Vec3(1,-hBis, 0),
+	Vec3(-1, hBis, 0),
+	Vec3(1, hBis, 0),
+
+	Vec3(-1,-hBis, 5),
+	Vec3(1,-hBis, 5),
+	Vec3(-1, hBis, 5),
+	Vec3(1, hBis, 5),
+};
+
+Vec3 g_boxWall1Bis[] = {
+	Vec3(-wBis,-1, 0),
+	Vec3(wBis,-1, 0),
+	Vec3(-wBis, 1, 0),
+	Vec3(wBis, 1, 0),
+
+	Vec3(-wBis,-1, 5),
+	Vec3(wBis,-1, 5),
+	Vec3(-wBis, 1, 5),
+	Vec3(wBis, 1, 5),
+};
