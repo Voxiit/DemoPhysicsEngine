@@ -215,3 +215,4 @@ Vec3 g_boxWall1Bis[] = {
 	Vec3(-wBis, 1, 5),
 	Vec3(wBis, 1, 5),
 };
+ 

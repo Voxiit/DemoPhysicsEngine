@@ -61,7 +61,7 @@ void ManifoldCollector::RemoveExpired() {
 
 		if (0 == manifold.m_numContacts)
 		{
-			m_manifolds.erase(m_manifolds.begin() +1);
+			m_manifolds.erase(m_manifolds.begin() + i);
 		}
 	}
 }
@@ -169,10 +169,10 @@ void Manifold::AddContact( const contact_t & contact_old ) {
 	contact_t contact = contact_old;
 	if (contact_old.bodyA != m_bodyA || contact_old.bodyB != m_bodyB)
 	{
-		contact.ptOnA_LocalSpace = contact_old.ptOnA_LocalSpace;
-		contact.ptOnB_LocalSpace = contact_old.ptOnB_LocalSpace;
-		contact.ptOnA_WorldSpace = contact_old.ptOnA_WorldSpace;
-		contact.ptOnB_WorldSpace = contact_old.ptOnB_WorldSpace;
+		contact.ptOnA_LocalSpace = contact_old.ptOnB_LocalSpace;
+		contact.ptOnB_LocalSpace = contact_old.ptOnA_LocalSpace;
+		contact.ptOnA_WorldSpace = contact_old.ptOnB_WorldSpace;
+		contact.ptOnB_WorldSpace = contact_old.ptOnA_WorldSpace;
 
 		contact.bodyA = m_bodyA;
 		contact.bodyB = m_bodyB;
@@ -213,7 +213,7 @@ void Manifold::AddContact( const contact_t & contact_old ) {
 		avg += m_contacts[2].ptOnA_LocalSpace;
 		avg += m_contacts[3].ptOnA_LocalSpace;
 		avg += contact.ptOnA_LocalSpace;
-		avg *= 0.2;
+		avg *= 0.2f;
 
 		float minDist = (avg - contact.ptOnA_LocalSpace).GetLengthSqr();
 		int newIdx = -1;

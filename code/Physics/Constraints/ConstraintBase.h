@@ -148,9 +148,10 @@ Constraint::Left
 */
 inline Mat4 Constraint::Left( const Quat & q ) {
 	Mat4 L;
-	
-	// TODO: Add code
-
+	L.rows[0] = Vec4(q.w, -q.x, -q.y, -q.z);
+	L.rows[1] = Vec4(q.x, q.w, -q.z, q.y);
+	L.rows[2] = Vec4(q.y, q.z, q.w, -q.x);
+	L.rows[3] = Vec4(q.z, -q.y, q.x, q.w);
 	return L.Transpose();
 }
 
@@ -161,8 +162,9 @@ Constraint::Right
 */
 inline Mat4 Constraint::Right( const Quat & q ) {
 	Mat4 R;
-	
-	// TODO: Add code
-
+	R.rows[0] = Vec4(q.w, -q.x, -q.y, -q.z);
+	R.rows[1] = Vec4(q.x, q.w, q.z, -q.y);
+	R.rows[2] = Vec4(q.y, -q.z, q.w, q.x);
+	R.rows[3] = Vec4(q.z, q.y, -q.x, q.w);
 	return R.Transpose();
 }

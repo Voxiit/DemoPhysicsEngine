@@ -32,6 +32,10 @@ public:
 	void InitializationFallingRope();
 	void InitializationMerryGoRound();
 	void InitializationStackBoxes();
+	void InitializationRagdoll();
+	void InitializationMotors();
+	void InitializationMovers();
+	void InitializationFinal();
 };
 
 void AddStandardSandBox(std::vector<Body>& bodies);
